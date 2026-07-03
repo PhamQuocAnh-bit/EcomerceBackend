@@ -22,4 +22,18 @@ public class ProductImageController {
     ) {
         return productImageService.uploadImages(productId, files);
     }
+    @PutMapping("/{productId}/images/{imageId}/main")
+    public List<ProductImageResponse> setMainImage(
+            @PathVariable Long productId,
+            @PathVariable Long imageId
+    ) {
+        return productImageService.setMainImage(productId, imageId);
+    }
+    @DeleteMapping("/{productId}/images/{imageId}")
+    public List<ProductImageResponse> deleteImage(
+            @PathVariable Long productId,
+            @PathVariable Long imageId
+    ) {
+        return productImageService.deleteImage(productId, imageId);
+    }
 }
