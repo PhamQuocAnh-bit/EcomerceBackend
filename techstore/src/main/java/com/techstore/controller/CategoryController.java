@@ -4,6 +4,7 @@ package com.techstore.controller;
 import com.techstore.dto.reponse.CategoryReponse;
 import com.techstore.dto.request.CategoryRequest;
 import com.techstore.service.CategoryService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;

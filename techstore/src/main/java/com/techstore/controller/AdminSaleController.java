@@ -4,6 +4,7 @@ package com.techstore.controller;
 import com.techstore.dto.reponse.SaleResponse;
 import com.techstore.dto.request.SaleRequest;
 import com.techstore.service.SaleService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin/sales")
+@SecurityRequirement(name = "Bearer Authentication")
 public class AdminSaleController {
     private final SaleService saleService ;
 

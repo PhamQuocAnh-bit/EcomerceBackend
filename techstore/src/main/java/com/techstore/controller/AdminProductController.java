@@ -4,6 +4,7 @@ package com.techstore.controller;
 import com.techstore.dto.reponse.ProductResponse;
 import com.techstore.dto.request.ProductRequest;
 import com.techstore.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin/products")
+@SecurityRequirement(name = "Bearer Authentication")
 public class AdminProductController {
     private final ProductService productService;
 

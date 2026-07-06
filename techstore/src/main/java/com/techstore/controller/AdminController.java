@@ -5,6 +5,7 @@ import com.techstore.dto.reponse.UserResponse;
 import com.techstore.entity.User;
 import com.techstore.repository.UserRepository;
 import com.techstore.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/users")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class AdminController {
     private final UserService userService;
