@@ -5,6 +5,7 @@ import com.techstore.dto.request.SaleRequest;
 import com.techstore.entity.Product;
 import com.techstore.entity.ProductSale;
 import com.techstore.entity.Sale;
+import com.techstore.enums.DiscountType;
 import com.techstore.enums.SaleStatus;
 import com.techstore.mapper.SaleMapper;
 import com.techstore.repository.ProductRepository;
@@ -16,6 +17,8 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -150,6 +153,34 @@ public class SaleService {
                 sale,
                 productSaleRepository.findBySaleId(id)
         );
+    }
+    public BigDecimal calculateDiscountedPrice(Product product) {
+        List<ProductSale> productSales = productSaleRepository.findByProductId(product.getId());
+
+        LocalDateTime now = LocalDateTime.now();
+
+        for (ProductSale productSale : productSales) {
+            Sale sale = productSale.getSale();
+
+            if (sale.getStatus() == SaleStatus.ACTIVE
+                    && !now.isBefore(sale.getStartDate())
+                    && !now.isAfter(sale.getEndDate())) {
+
+                if (sale.getDiscountType() == DiscountType.PERCENT) {
+                    BigDecimal discount = product.getOriginalPrice()
+                            .multiply(sale.getDiscountValue())
+                            .divide(BigDecimal.valueOf(100));
+
+                    return product.getOriginalPrice().subtract(discount);
+                }
+
+                if (sale.getDiscountType() == DiscountType.FIXED_AMOUNT) {
+                    return product.getOriginalPrice().subtract(sale.getDiscountValue());
+                }
+            }
+        }
+
+        return product.getOriginalPrice();
     }
 
 }

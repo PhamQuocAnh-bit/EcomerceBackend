@@ -1,6 +1,7 @@
 package com.techstore.mapper;
 
 import com.techstore.dto.reponse.ProductImageResponse;
+import com.techstore.dto.reponse.ProductPriceResult;
 import com.techstore.dto.reponse.ProductResponse;
 import com.techstore.entity.Product;
 import com.techstore.entity.ProductImage;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Component
 public class ProductMapper {
-    public ProductResponse toResponse (Product product){
+    public ProductResponse toResponse (Product product, ProductPriceResult price){
         List<ProductImageResponse> imageResponses = toImageResponses(product.getImages());
         String mainImage = imageResponses.stream()
                 .filter(img -> Boolean.TRUE.equals(img.getMainImage()))
@@ -25,7 +26,17 @@ public class ProductMapper {
                 .sku(product.getSku())
                 .slug(product.getSlug())
                 .description(product.getDescription())
+
                 .originalPrice(product.getOriginalPrice())
+                .salePrice(price.getSalePrice())
+                .finalPrice(price.getFinalPrice())
+                .onSale(price.getOnSale())
+                .discountAmount(price.getDiscountAmount())
+                .discountType(price.getDiscountType())
+                .discountValue(price.getDiscountValue())
+                .saleName(price.getSaleName())
+
+
                 .stockQuantity(product.getStockQuantity())
                 .soldQuantity(product.getSoldQuantity())
                 .categoryId(product.getCategory().getId())

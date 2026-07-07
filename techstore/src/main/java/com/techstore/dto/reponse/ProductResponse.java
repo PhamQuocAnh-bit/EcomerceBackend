@@ -1,6 +1,7 @@
 package com.techstore.dto.reponse;
 
 
+import com.techstore.enums.DiscountType;
 import com.techstore.enums.ProductStatus;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,13 @@ public class ProductResponse {
     private String slug;
     private String description ;
     private BigDecimal originalPrice ;
+    private BigDecimal salePrice;
+    private BigDecimal finalPrice;
+    private Boolean onSale;
+    private BigDecimal discountAmount;
+    private DiscountType discountType;
+    private BigDecimal discountValue;
+    private String saleName ;
     private Integer stockQuantity;
     private Integer soldQuantity;
     private ProductStatus status ;
