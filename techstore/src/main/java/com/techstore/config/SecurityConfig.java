@@ -42,7 +42,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/profile",
                                 "/api/users/update-profile",
-                                "/api/users/change-password"
+                                "/api/users/change-password",
+                                "/api/addresses/**"
                         ).authenticated()
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
