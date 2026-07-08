@@ -21,4 +21,16 @@ public interface ProductSaleRepository extends JpaRepository<ProductSale,Long> {
         AND s.endDate >= CURRENT_TIMESTAMP
     """)
     List<ProductSale> findActiveSalesByProductIds(List<Long> productIds);
+
+    @Query("""
+    SELECT ps FROM ProductSale ps
+    JOIN ps.sale s
+    WHERE ps.product.id = :productId
+    AND s.status = com.techstore.enums.SaleStatus.ACTIVE
+    AND s.startDate <= CURRENT_TIMESTAMP
+    AND s.endDate >= CURRENT_TIMESTAMP
+""")
+    List<ProductSale> findActiveSalesByProductId(Long productId);
+
+
 }
