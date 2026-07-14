@@ -32,6 +32,7 @@ public class OrderService {
     private final ProductSaleRepository productSaleRepository;
     private final ProductPricingService productPricingService;
     private final OrderMapper orderMapper;
+    private final PaymentService paymentService;
 
     @Transactional
     public OrderResponse createOrder(CustomUserDetails userDetails, CreateOrderRequest request) {
@@ -107,11 +108,16 @@ public class OrderService {
         }
 
         order.setTotalProductAmount(totalProductAmount);
-        order.setTotalAmount(totalProductAmount.add(SHIPPING_FEE));
+        order.setTotalAmount(
+                totalProductAmount.add(order.getShippingFee())
+        );
 
         Order savedOrder = orderRepository.save(order);
 
-        // Cart có orphanRemoval = true nên clear là đủ
+
+        paymentService.createPaymentForOrder(savedOrder);
+
+
         cart.getItems().clear();
         cartRepository.save(cart);
 
@@ -146,40 +152,103 @@ public class OrderService {
         return orderMapper.toResponse(order);
     }
 
+//    @Transactional
+//    public OrderResponse updateStatus(Long id, UpdateOrderStatusRequest request) {
+//        Order order = orderRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+//
+//        OrderStatus oldStatus = order.getStatus();
+//        OrderStatus newStatus = request.getStatus();
+//
+//        validateStatusTransition(oldStatus, newStatus);
+//
+//        if (newStatus == OrderStatus.CANCELLED) {
+//            restoreStock(order);
+//        }
+//
+//        order.setStatus(newStatus);
+//
+//        return orderMapper.toResponse(orderRepository.save(order));
+//    }
+
     @Transactional
-    public OrderResponse updateStatus(Long id, UpdateOrderStatusRequest request) {
+    public OrderResponse updateStatus(
+            Long id,
+            UpdateOrderStatusRequest request
+    ) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy đơn hàng")
+                );
 
         OrderStatus oldStatus = order.getStatus();
         OrderStatus newStatus = request.getStatus();
 
         validateStatusTransition(oldStatus, newStatus);
 
+
         if (newStatus == OrderStatus.CANCELLED) {
             restoreStock(order);
+            paymentService.cancelPayment(order.getId());
         }
 
         order.setStatus(newStatus);
 
-        return orderMapper.toResponse(orderRepository.save(order));
-    }
+        Order savedOrder = orderRepository.save(order);
 
-    @Transactional
-    public OrderResponse cancelMyOrder(CustomUserDetails userDetails, Long id) {
-        Order order = orderRepository.findByIdAndUserId(id, userDetails.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+        if (newStatus == OrderStatus.DELIVERED
+                && savedOrder.getPaymentMethod() == PaymentMethod.COD) {
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new RuntimeException("Chỉ có thể hủy đơn hàng đang chờ xác nhận");
+            paymentService.markCodAsPaid(savedOrder.getId());
         }
 
-        restoreStock(order);
-
-        order.setStatus(OrderStatus.CANCELLED);
-
-        return orderMapper.toResponse(orderRepository.save(order));
+        return orderMapper.toResponse(savedOrder);
     }
+
+//    @Transactional
+//    public OrderResponse cancelMyOrder(CustomUserDetails userDetails, Long id) {
+//        Order order = orderRepository.findByIdAndUserId(id, userDetails.getId())
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+//
+//        if (order.getStatus() != OrderStatus.PENDING) {
+//            throw new RuntimeException("Chỉ có thể hủy đơn hàng đang chờ xác nhận");
+//        }
+//
+//        restoreStock(order);
+//
+//        order.setStatus(OrderStatus.CANCELLED);
+//
+//        return orderMapper.toResponse(orderRepository.save(order));
+//    }
+@Transactional
+public OrderResponse cancelMyOrder(
+        CustomUserDetails userDetails,
+        Long id
+) {
+    Order order = orderRepository.findByIdAndUserId(
+                    id,
+                    userDetails.getId()
+            )
+            .orElseThrow(() ->
+                    new RuntimeException("Không tìm thấy đơn hàng")
+            );
+
+    if (order.getStatus() != OrderStatus.PENDING) {
+        throw new RuntimeException(
+                "Chỉ có thể hủy đơn hàng đang chờ xác nhận"
+        );
+    }
+
+    restoreStock(order);
+
+    paymentService.cancelPayment(order.getId());
+
+    order.setStatus(OrderStatus.CANCELLED);
+
+    Order savedOrder = orderRepository.save(order);
+
+    return orderMapper.toResponse(savedOrder);
+}
 
     private void validateProductBeforeOrder(Product product, Integer quantity) {
         if (product.getStatus() != ProductStatus.ACTIVE) {
