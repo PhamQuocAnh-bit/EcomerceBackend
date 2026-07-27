@@ -75,12 +75,12 @@ Dự án tuân theo kiến trúc **Layered Architecture (N-Tier)** chuẩn mực
 
 ```mermaid
 graph TD
-    Client[Client (Web/Mobile)] -->|HTTP Request| Controller[Controller Layer (REST API)]
-    Controller -->|DTO| Service[Service Layer (Business Logic)]
-    Service -->|Entity| Repository[Repository Layer (Data Access)]
-    Repository -->|JPA / Hibernate| Database[(MySQL Database)]
+    Client["Client (Web/Mobile)"] -->|HTTP Request| Controller["Controller Layer (REST API)"]
+    Controller -->|DTO| Service["Service Layer (Business Logic)"]
+    Service -->|Entity| Repository["Repository Layer (Data Access)"]
+    Repository -->|JPA / Hibernate| Database[("MySQL Database")]
     
-    Service -->|Upload Image| Cloudinary[Cloudinary (CDN)]
+    Service -->|Upload Image| Cloudinary["Cloudinary (CDN)"]
 ```
 
 ### Cấu Trúc Thư Mục Thực Tế:
@@ -133,7 +133,6 @@ cloudinary:
   api-key: ${CLOUDINARY_API_KEY:your_api_key}
   api-secret: ${CLOUDINARY_API_SECRET:your_api_secret}
 ```
-
 
 ---
 
