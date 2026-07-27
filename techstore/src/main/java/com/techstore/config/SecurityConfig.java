@@ -60,7 +60,8 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/payments/vnpay/return",
-                                "/api/payments/vnpay/ipn"
+                                "/api/payments/vnpay/ipn",
+                                "/api/v1/chat/**"
                         ).permitAll()
 
                         .requestMatchers(
