@@ -33,6 +33,7 @@ public class OrderService {
     private final ProductPricingService productPricingService;
     private final OrderMapper orderMapper;
     private final PaymentService paymentService;
+    private final InventoryTransactionService inventoryTransactionService;
 
     @Transactional
     public OrderResponse createOrder(CustomUserDetails userDetails, CreateOrderRequest request) {
@@ -103,6 +104,8 @@ public class OrderService {
             product.setSoldQuantity(product.getSoldQuantity() + cartItem.getQuantity());
 
             productRepository.save(product);
+
+            inventoryTransactionService.recordOrderExport(product, cartItem.getQuantity(), order.getOrderCode());
 
             totalProductAmount = totalProductAmount.add(totalPrice);
         }
@@ -296,6 +299,8 @@ public OrderResponse cancelMyOrder(
             product.setSoldQuantity(Math.max(0, product.getSoldQuantity() - detail.getQuantity()));
 
             productRepository.save(product);
+
+            inventoryTransactionService.recordOrderRestore(product, detail.getQuantity(), order.getOrderCode());
         }
     }
 
