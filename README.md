@@ -134,8 +134,6 @@ cloudinary:
   api-secret: ${CLOUDINARY_API_SECRET:your_api_secret}
 ```
 
-> [!WARNING]
-> **Không bao giờ commit file chứa Secret thật lên Git.** Khuyến nghị sử dụng biến môi trường (Environment Variables) trên máy thật (Production).
 
 ---
 
@@ -209,5 +207,5 @@ Dự án sử dụng mô hình Git Flow. Nếu bạn là một phần của team
 
 ---
 <div align="center">
-  <b>Được phát triển với ☕ và ❤️. </b>
+  <b>Được phát triển bởi Phạm Quốc Anh. </b>
 </div>
